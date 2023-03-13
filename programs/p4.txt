@@ -1,0 +1,6 @@
+start: LDD A
+INC ACC
+STO A
+OUT
+END
+A: 66
