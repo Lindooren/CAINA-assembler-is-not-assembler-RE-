@@ -128,3 +128,4 @@ if __name__ == "__main__":
     MyAPP = APP()
     MyAPP.mainloop()
 
+# really trash
