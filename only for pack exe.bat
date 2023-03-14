@@ -1,1 +1,1 @@
-pyinstaller --onefile main.py --noconsole
+pyinstaller --onefile main.py --noconsole --icon="D:\A2-2\computer\A2computer\CAINA assembler is not assembler\CAINA-assembler-is-not-assembler-RE-\resources\huaji.ico"

@@ -8,7 +8,7 @@ class APP (tk.Tk):
         super().__init__()
 
         # main window setup
-        self.directory = os.path.dirname(__file__)
+        self.directory = os.path.abspath(".")
         self.resizable(False, False)
         self.config(background="grey")
         self.title("CAINA is not assembler V2.1.0")
@@ -127,6 +127,3 @@ self.GUIprocess.Number
 if __name__ == "__main__":
     MyAPP = APP()
     MyAPP.mainloop()
-
-# really trash
-# omg the opload
