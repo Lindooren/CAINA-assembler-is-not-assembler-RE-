@@ -36,6 +36,15 @@ class APP (tk.Tk):
         self.GUItext.grid(row = 0, column = 0, columnspan = 3, pady = 10)
         self.ErrorConsole.grid(row = 1, column = 0, columnspan = 3, pady = 10)
 
+        # color_change
+        self.GUItext.tag_add("State", "6.8", "6.39")
+        self.GUItext.tag_add("Error", "8.8", "8.39")
+        self.GUItext.tag_add("ProcessEnded", "9.15", "9.39")
+
+        self.GUItext.tag_config("State", foreground = "blue")
+        self.GUItext.tag_config("ProcessEnded", foreground = "red")
+        self.GUItext.tag_config("Error", foreground = "green")
+
     # file open
     def GUIfileopen (self):
         result = self.GUIprocess.FileOpen()
@@ -73,6 +82,49 @@ class APP (tk.Tk):
         self.ErrorConsole.insert("0.0", chars = self.errorexplain())
         self.GUItext.update()
         self.ErrorConsole.update()
+        self.colour_update()
+
+    def colour_update (self):
+        StateColour, ProcessEndedColour, ErrorColour = "", "", ""
+
+        # StateColour
+        if self.GUIprocess.State == "Waiting":
+            StateColour = "blue"
+        
+        elif self.GUIprocess.State == "Running":
+            StateColour = "green"
+
+        elif self.GUIprocess.State == "Ended":
+            StateColour = "yellow"
+
+        else:
+            StateColour = "red"
+
+        # ProcessEndedColour
+        if self.GUIprocess.end == True:
+            ProcessEndedColour = "green"
+
+        else:
+            ProcessEndedColour = "red"
+
+        # ErrorColour
+        if self.GUIprocess.error == "no_error":
+            ErrorColour = "green"
+
+        else:
+            ErrorColour = "red"
+        
+        self.GUItext.tag_remove("State", "6.8", "6.39")
+        self.GUItext.tag_add("Error", "8.8", "8.39")
+        self.GUItext.tag_add("ProcessEnded", "9.15", "9.39")
+
+        self.GUItext.tag_add("State", "6.8", "6.39")
+        self.GUItext.tag_add("Error", "8.8", "8.39")
+        self.GUItext.tag_add("ProcessEnded", "9.15", "9.39")
+
+        self.GUItext.tag_configure("State", foreground = StateColour)
+        self.GUItext.tag_configure("ProcessEnded", foreground = ProcessEndedColour)
+        self.GUItext.tag_configure("Error", foreground = ErrorColour)
 
     # get infomessage
     def getinfomessage (self):
