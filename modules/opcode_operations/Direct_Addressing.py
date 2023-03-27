@@ -1,7 +1,7 @@
-from TypeCheck import *
-from Bitwise import *
-#from .TypeCheck import *
-#from .Bitwise import *
+#from TypeCheck import *
+#from Bitwise import *
+from .TypeCheck import *
+from .Bitwise import *
 
 def DirectAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, label_addr, line_addr, CurrentAddress):
     error_content = ""
@@ -36,6 +36,7 @@ def DirectAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, Addre
             else:
             
                 # selection
+                # Normal Direct Addressing Opcodes
                 if Opcode in ["LDD", "STO", "JMP", "CMP", "JPE", "JPN", "ADD", "SUB"]:
                     try:
                         if not(Opcode in ["JMP", "JPE", "JPN", "STO"]):
@@ -67,9 +68,6 @@ def DirectAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, Addre
                         elif Opcode == "SUB":
                             ACC -= Number
 
-                        if not Opcode in ["JMP", "JPE", "JPN"]:
-                            PC = PC + 1
-
                     except ValueError:
                         error = "invalid_data_L1_address"
                         error_content = "Line {}, Address {}.\n\Line {}, Level 1 address {}.\nThe data \'{}\' under level 1 address is invalid.".format(line_addr[CurrentAddress], CurrentAddress, line_addr[AddressL1], AddressL1, memory[AddressL1][1])
@@ -78,6 +76,7 @@ def DirectAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, Addre
                         error = "data_not_find_L1_address"
                         error_content = "Line {}, Address {}.\nCannot find the data under level 1 address \'{}\'.".format(line_addr[CurrentAddress], CurrentAddress, AddressL1)
 
+                # Bitwise Direct Addressing Opcodes
                 elif Opcode in ["AND", "OR", "XOR"]:
                     Number = str(memory[AddressL1][1])
                     BinaryResultCheck = BinaryNumberCheck(Number)
@@ -90,7 +89,9 @@ def DirectAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, Addre
                     else:
                         error = "invalid_binary_number"
                         error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\n\'{}\' is not a valid binary number".format(line_addr[CurrentAddress], CurrentAddress,line_addr[AddressL1], AddressL1, Number)
-
+            
+            if not Opcode in ["JMP", "JPE", "JPN"]:
+                PC = PC + 1
 
     return memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, error_content
 

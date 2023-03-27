@@ -1,5 +1,5 @@
-from TypeCheck import *
-#from .TypeCheck import *
+#from TypeCheck import *
+from .TypeCheck import *
 
 def IndirectAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, label_addr, line_addr, CurrentAddress):
     error_content = ""

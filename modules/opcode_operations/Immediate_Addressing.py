@@ -1,7 +1,7 @@
-from TypeCheck import *
-from Bitwise import *
-#from .TypeCheck import *
-#from .Bitwise import *
+#from TypeCheck import *
+#from Bitwise import *
+from .TypeCheck import *
+from .Bitwise import *
 
 def ImmediateAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, line_addr, CurrentAddress):
     error_content = ""
