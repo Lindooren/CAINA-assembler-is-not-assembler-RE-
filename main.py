@@ -180,7 +180,7 @@ self.GUIprocess.Number
 
         return err_message
 
-# main
+# main running
 if __name__ == "__main__":
     MyAPP = APP()
     MyAPP.mainloop()
