@@ -36,7 +36,8 @@ def IndexedAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, Addr
 
             else:
                 try:
-                    Number = int(memory[indexed_addr][1])
+                    if not Opcode in ["STX"]:
+                        Number = int(memory[indexed_addr][1])
 
                     #selection
                     if Opcode == "LDX":

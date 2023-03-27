@@ -21,12 +21,12 @@ class APP (tk.Tk):
         self.GUIprocess = process()
 
         # parts setup
-        self.fileopenbtn = tk.Button(master = self, text = "Load program", command = self.GUIfileopen, width = 20, height = 1, bd = 4, font = ("黑体", 15, 'bold'))
-        self.steppingbtn = tk.Button(master = self, text = "Step", command = self.GUIstepping, width = 20, height = 1, bd = 4, font = ("黑体", 15, 'bold'))
-        self.clearingbtn = tk.Button(master = self, text = "Clear", command = self.GUIclearing, width = 20, height = 1, bd = 4, font = ("黑体", 15, 'bold'))
-        self.GUItext = tk.Text(master = self, fg = "white", bg = "black", width = 40, height = 19, font = ("黑体", 12, 'bold'))
+        self.fileopenbtn = tk.Button(master = self, text = "Load program", command = self.GUIfileopen, width = 20, height = 1, bd = 4, font = ("System", 15, 'bold'))
+        self.steppingbtn = tk.Button(master = self, text = "Step", command = self.GUIstepping, width = 20, height = 1, bd = 4, font = ("System", 15, 'bold'))
+        self.clearingbtn = tk.Button(master = self, text = "Clear", command = self.GUIclearing, width = 20, height = 1, bd = 4, font = ("System", 15, 'bold'))
+        self.GUItext = tk.Text(master = self, fg = "white", bg = "black", width = 40, height = 19, font = ("System", 12, 'bold'))
         self.GUItext.insert("0.0", chars = self.getinfomessage())
-        self.ErrorConsole = tk.Text(master = self, fg = "white", bg = "black", width = 80, height = 6, font = ("黑体", 10, 'bold'))
+        self.ErrorConsole = tk.Text(master = self, fg = "white", bg = "black", width = 60, height = 8, font = ("System", 10, 'bold'))
         self.ErrorConsole.insert("0.0", chars = self.errorexplain())
 
         # grid
@@ -44,6 +44,7 @@ class APP (tk.Tk):
         self.GUItext.tag_config("State", foreground = "blue")
         self.GUItext.tag_config("ProcessEnded", foreground = "red")
         self.GUItext.tag_config("Error", foreground = "green")
+        self.ErrorConsole.configure(background = "blue")
 
     # file open
     def GUIfileopen (self):
@@ -90,15 +91,19 @@ class APP (tk.Tk):
         # StateColour
         if self.GUIprocess.State == "Waiting":
             StateColour = "blue"
+            self.ErrorConsole.configure(background = "blue", foreground = "white")
         
         elif self.GUIprocess.State == "Running":
             StateColour = "green"
+            self.ErrorConsole.configure(background = "green", foreground = "white")
 
         elif self.GUIprocess.State == "Ended":
             StateColour = "yellow"
+            self.ErrorConsole.configure(background = "yellow", foreground = "black")
 
         else:
             StateColour = "red"
+            self.ErrorConsole.configure(background = "red", foreground = "white")
 
         # ProcessEndedColour
         if self.GUIprocess.end == True:
@@ -125,10 +130,10 @@ class APP (tk.Tk):
         self.GUItext.tag_configure("State", foreground = StateColour)
         self.GUItext.tag_configure("ProcessEnded", foreground = ProcessEndedColour)
         self.GUItext.tag_configure("Error", foreground = ErrorColour)
-
+        
     # get infomessage
     def getinfomessage (self):
-        message = "----------------------------------------\n\
+        message = "--------------------------------------------------------------------------------\n\
 PC : {}\n\
 ACC : {}\n\
 IX : {}\n\
@@ -137,7 +142,7 @@ State : {}\n\
 Mode : {}\n\
 Error : {}\n\
 ProcessEnded : {}\n\
-----------------------------------------\n\
+--------------------------------------------------------------------------------\n\
 CurrentAddress : {}\n\
 Label : {}\n\
 Opcode : {}\n\
@@ -146,7 +151,7 @@ Compare : {}\n\
 AddressL1 : {}\n\
 AddressL2 : {}\n\
 Number : {}\n\
-----------------------------------------\n\
+--------------------------------------------------------------------------------\n\
 ".format(self.GUIprocess.PC,
 self.GUIprocess.ACC,
 self.GUIprocess.IX,
@@ -169,9 +174,9 @@ self.GUIprocess.Number
 
     # errorexplain
     def errorexplain (self):
-        err_message = ""
+        err_message = "Error Console Logger:\n"
         if self.GUIprocess.error != "no_error":
-            err_message = "{}\n{}".format(self.GUIprocess.error, self.GUIprocess.error_content)
+            err_message = err_message + "{}\n{}".format(self.GUIprocess.error, self.GUIprocess.error_content)
 
         return err_message
 

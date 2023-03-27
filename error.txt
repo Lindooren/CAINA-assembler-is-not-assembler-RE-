@@ -1,0 +1,63 @@
+no_error:
+    No error.
+invalid_opcode:
+    Invalid opcode.
+invalid_use_opcode_operand:
+    Invalid use of opcode and operand.
+no_operand:
+    Operand not find.
+invalid_label_name:
+    The label is invalid.
+invalid_number:
+    The number is invalid.
+empty_memory_space:
+    At current address the memory is empty!
+END/OUT_error:
+    END/OUT opcodes do not need operand but operand is given.
+
+#------------------------------------------------------------------------
+Level 1 addressing error (一级寻址常见错误)
+
+invalid_data_L1_address:
+    The data at L1_address is invalid.
+data_not_find_L1_address:
+    Can't find the data at L1 address.
+L1_address_out_of_range:
+    L1 address too small or exceed memory limit.
+label_not_found_L1_address:
+    Can't find the label correspond to the L1_address.
+
+#------------------------------------------------------------------------
+Level 2 addressing error (二级寻址常见错误)
+
+invalid_data_L2_address:
+    The data under for L2_address is invalid.
+data_not_find_L2_address:
+    Can't find the data under for L2 address.
+L2_address_out_of_range:
+    L1 address too small or exceed memory limit.
+label_not_found_L2_address:
+    Can't find the label correspond to the L2_address.
+
+#------------------------------------------------------------------------
+Indexed addressing error (基址寻址常见错误)
+
+indexed_address_out_of_range:
+    The indexed address too small or exceed memory limit.
+invalid_data_indexed_address:
+    The data under for indexed address is invalid.
+data_not_find_indexed_address:
+    Can't find the data under for indexed address.
+
+#------------------------------------------------------------------------
+Register operation error (寄存器操作常见错误)
+
+invalid_register:
+    Invalid Register name.
+
+#------------------------------------------------------------------------
+Bitwise operation error (二进制逻辑比较错误)
+
+invalid_binary_number:
+    invalid binary number.
+    

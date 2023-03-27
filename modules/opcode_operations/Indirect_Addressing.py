@@ -1,5 +1,5 @@
-# from TypeCheck import *
-from .TypeCheck import *
+from TypeCheck import *
+#from .TypeCheck import *
 
 def IndirectAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, label_addr, line_addr, CurrentAddress):
     error_content = ""
@@ -69,7 +69,8 @@ def IndirectAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, Add
                             try:
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                                Number = int(memory[AddressL2][1]) 
+                                if not (Opcode in ["STI"]):
+                                    Number = int(memory[AddressL2][1]) 
                                         
                                 # selection
                                 if Opcode == "LDI":
@@ -77,6 +78,9 @@ def IndirectAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, Add
 
                                 elif Opcode == "CMI":
                                     Compare = True if ACC == Number else False
+
+                                elif Opcode == "STI":
+                                    memory[AddressL2][1] = ACC
 
                                 PC = PC + 1
                             
@@ -92,17 +96,10 @@ def IndirectAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, Add
 
 #testing
 if __name__ == "__main__":
-    
-    memory = [[None, None], 
-    ['Start', 'LDM B'], 
-    [None, 'LDM C'], 
-    [None, 'LDM 5'], 
-    ['B', 'C'], 
-    ['C', '10'], 
-    [None, None],
-    [None, 'GGG']]
-
-    label_addr = {'Start': 1, 'B': 4, 'C': 5}
+    memory = [[None, None],
+            [None, 'LDI 2'],
+            [None, '3'],
+            [None, None]]
 
     PC = 1
     ACC = 10
@@ -114,8 +111,11 @@ if __name__ == "__main__":
     AddressL2 = None
     Number = None
     Out = None
-    Opcode = "CMI"
-    Operand = "C"
+    Opcode = "STI"
+    Operand = "2"
+    label_addr = {}
+    line_addr = {1:1, 2:2, 3:3}
+    CurrentAddress = PC
 
     print("memory {}\n\
         PC {}\n\
@@ -129,7 +129,8 @@ if __name__ == "__main__":
         Number {}\n\
         Out {}\n\
         Opcode {}\n\
-        Operand {}\n".format(*IndirectAddressing(memory, 
+        Operand {}\n\
+        error_content {}".format(*IndirectAddressing(memory, 
         PC, 
         ACC, 
         IX, 
@@ -141,7 +142,7 @@ if __name__ == "__main__":
         Number, 
         Out, 
         Opcode, 
-        Operand,
-        label_addr)))
-
-    
+        Operand, 
+        label_addr,
+        line_addr, 
+        CurrentAddress)))

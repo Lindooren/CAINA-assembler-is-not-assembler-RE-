@@ -38,16 +38,37 @@ def AddressNumberCheck (address):
 
     return True
 
+# check a binary digit if it is valid.
+def BinaryNumberCheck (number):
+    if number[0] == "B" or number[0] == "b":
+        number = RemoveB(number)
+        ValidNumbers = "01"
+        for bit in number:
+            if not (bit in ValidNumbers):
+                return False
+
+        return True
+    else:
+        return False
+
+# remove the beginning B letter
+def RemoveB (binary):
+    temp = list(binary)
+    temp.pop(0)
+    return "".join(temp)
+
+
 # check if label in the list_to_address dictionary.
 
 #main
 if __name__ == "__main__":
-    import os
+    """import os
     print(os.path.dirname(__file__))
-    #print(OperandTypeCheck("1999999"))
+    #print(OperandTypeCheck("1999999"))"""
     
     """a = {"sb":666}
     try:
         print(a["jb"])
     except KeyError:
         print("SB")"""
+    print(BinaryNumberCheck("B101056789"))
