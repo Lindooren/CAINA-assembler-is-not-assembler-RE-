@@ -1,167 +1,176 @@
-from .opcode_operations.Immediate_Addressing import *
-from .opcode_operations.Direct_Addressing import *
-from .opcode_operations.Indirect_Addressing import *
-from .opcode_operations.Indexed_Addressing import *
-from .opcode_operations.Registers import *
-from .opcodes import *
+#from .opcode_operations.immediate_addressing import *
+#from .opcode_operations.direct_addressing import *
+#from .opcode_operations.indirect_addressing import *
+#from .opcode_operations.indexed_addressing import *
+#from .opcode_operations.registers import *
+#from .opcodes import *
+
+from opcode_operations.immediate_addressing import *
+from opcode_operations.direct_addressing import *
+from opcode_operations.indirect_addressing import *
+from opcode_operations.indexed_addressing import *
+from opcode_operations.registers import *
+from opcodes import *
 
 # main thread for analyse and run
-def AnalysisAndRun (memory, PC, ACC, IX, Compare, label_addr, line_addr, CurrentAddress):
+def AnalysisAndRun (memory, pc, acc, ix, compare, label_addr, line_addr, current_address):
 
     # initialize all variables
     end = False
-    Mode = ""
-    AddressL1 = None
-    AddressL2 = None
-    Number = None
-    Out = ""
-    Opcode = ""
-    Operand = ""
+    mode = ""
+    addressL1 = None
+    addressL2 = None
+    number = None
+    out = ""
+    opcode = ""
+    operand = ""
     error = "no_error"
     label = ""
     error_content = ""
-    
-    label = memory[PC][0]
-    Instruction = memory[PC][1]
 
-    if memory[PC] == [None, None]:
-        error = "empty_memory_space"
-        error_content = "Address {}.\nCurrent memory space is empty, cannot read instruction or data.".format(CurrentAddress)
-        
-       
-    else:
-        label = memory[PC][0]
-        Instruction = memory[PC][1].split(" ")
-        Opcode = Instruction[0]
+    if 1 <= current_address <= 511:
+        this_memory_location = memory[current_address]
 
-        # check presence
-        if not (Opcode in opcodes.Opcodes):
-            # Invalid Opcode
-            error = "invalid_opcode"
-            error_content = "Line {}, Address {}.\n\'{}\' is not a valid opcode.".format(line_addr[CurrentAddress], CurrentAddress, Opcode)
+        # if current memory space is empty (None type)
+        if memory[current_address].type == None:
+            error = "empty_memory_space"
+            error_content = "Address {}.\nCurrent memory space is empty, cannot read instruction or data.".format(current_address)
+            
+        # if current memory space is an instruction
+        elif memory[current_address].type == "instruction":
+            opcode = this_memory_location.opcode
+            operand = this_memory_location.operand
 
-        else:
+            # check the validity of opcode
+            if not (opcode in opcodes.opcodes):
+                # Invalid Opcode
+                error = "invalid_opcode"
+                error_content = "Line {}, Address {}.\n\'{}\' is not a valid opcode.".format(line_addr[current_address], current_address, opcode)
 
-#---------------------------------------------------------------------------------------------------------------------------
-            # OUT and END are opcodes with no operands, if operands exist then invalid
-            if Opcode == "OUT" or Opcode == "END":
-                if len(Instruction) > 1:
-                    error = "END/OUT_error"
-                    error_content = "Line {}, Address {}.\n\'END\'&\'OUT\' opcodes do not need opcodes but opcodes find.".format(line_addr[CurrentAddress], CurrentAddress)
-                
-                # Deal with opcode out or end
-                else:
-                    if Opcode == "OUT":
-                        Out = ACC
-
-                    else:
-                        end = True
-
-                PC += 1
-
-#---------------------------------------------------------------------------------------------------------------------------
-            # Other opcodes
             else:
-                # these opcodes require only one opcode
-                if len(Instruction) <= 1:
-                    error = "no_operand"
-                    error_content = "Line {}, Address {}.\nOperand not found.".format(line_addr[CurrentAddress], CurrentAddress)
 
-                else:
-                    Operand = Instruction[1]
-
-                    # immediate addressing "LDM", "LDR", "CMP", "ADD", "SUB"
-                    if Opcode in opcodes.Immediate_Opcodes and Operand[0] == "#":
-                        Mode = "Immediate Addressing"
-
-                        memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, error_content = ImmediateAddressing(memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, line_addr, CurrentAddress)
-
-                    # Direct addressing "LDD", "STO", "JMP", "CMP", "JPE", "JPN", "ADD", "SUB"
-                    elif Opcode in opcodes.Direct_Opcodes:
-                        Mode = "Direct Addressing"
-
-                        memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, error_content = DirectAddressing(memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, label_addr, line_addr, CurrentAddress)
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                # OUT and END are opcodes with no operands, if operands exist then invalid
+                if opcode == "OUT" or opcode == "END":
+                    if operand != None:
+                        error = "END/OUT_error"
+                        error_content = "Line {}, Address {}.\n\'END\'&\'OUT\' opcodes do not need opcodes but opcodes find.".format(line_addr[current_address], current_address)
                     
-                    # Indirect addressing "LDI", "CMI"
-                    elif Opcode in opcodes.Indirect_Opcodes:
-                        Mode = "Indirect Addressing"
-
-                        memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, error_content = IndirectAddressing(memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, label_addr, line_addr, CurrentAddress)
-
-                    # Indexed addressing "LDX"
-                    elif Opcode in opcodes.Indexed_Opcodes:
-                        Mode = "Indexed Addressing"
-
-                        memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, error_content = IndexedAddressing(memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, label_addr, line_addr, CurrentAddress)
-
-                    #registers
-                    elif Opcode in opcodes.Register_Opcodes:
-                        Mode = "Register opertation"
-
-                        memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, error_content = Registers(memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, line_addr, CurrentAddress)
-                    
+                    # Deal with opcode out or end
                     else:
-                        error = "invalid_use_opcode_operand"
-                        error_content = "Line {}, Address {}.\nIncorrect usage of combinations of opcodes and operands.\ne.g. Immediate opcodes \'LDM\' should come with operand #<number> but \'#\' is not included.".format(line_addr[CurrentAddress], CurrentAddress)
+                        if opcode == "OUT":
+                            out = acc
 
-    return memory, PC, ACC, IX, Compare, error, end, Mode, AddressL1, AddressL2, Number, Out, Opcode, Operand, label, error_content
+                        else:
+                            end = True
+
+                    pc += 1
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                # Other opcodes
+                else:
+                    # these opcodes require only one opcode
+                    if opcode == None:
+                        error = "no_operand"
+                        error_content = "Line {}, Address {}.\nOperand not found.".format(line_addr[current_address], current_address)
+
+                    else:
+
+                        # immediate addressing
+                        if opcode in opcodes.immediate_opcodes and operand[0] == "#":
+                            mode = "Immediate Addressing"
+
+                            memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, error_content = ImmediateAddressing(memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, line_addr, current_address)
+
+                        # Direct addressing
+                        elif opcode in opcodes.direct_opcodes:
+                            mode = "Direct Addressing"
+
+                            memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, error_content = DirectAddressing(memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, label_addr, line_addr, current_address)
+                        
+                        # Indirect addressing
+                        elif opcode in opcodes.indirect_opcodes:
+                            mode = "Indirect Addressing"
+
+                            memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, error_content = IndirectAddressing(memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, label_addr, line_addr, current_address)
+
+                        # Indexed addressing
+                        elif opcode in opcodes.indexed_opcodes:
+                            mode = "Indexed Addressing"
+
+                            memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, error_content = IndexedAddressing(memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, label_addr, line_addr, current_address)
+
+                        # Registers
+                        elif opcode in opcodes.register_opcodes:
+                            mode = "Register opertation"
+
+                            memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, error_content = Registers(memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, line_addr, current_address)
+                        
+                        # opcode and operand can't be matched
+                        else:
+                            error = "invalid_use_opcode_operand"
+                            error_content = "Line {}, Address {}.\nIncorrect usage of combinations of opcodes and operands.\ne.g. Immediate opcodes \'LDM\' should come with operand #<number> but \'#\' is not included.".format(line_addr[current_address], current_address)
+
+    else:
+
+        # case where the current address or the next PC is pointed to non exist in the memory.
+        error = "address_out_of_range"
+        error_content = "Line {} Current address \'{}\' is too big or too small.".format(line_addr[current_address], current_address)
+    return memory, pc, acc, ix, compare, error, end, mode, addressL1, addressL2, number, out, opcode, operand, label, error_content
 
 # testing
 if __name__ == "__main__":
-    from .file_open import *
+    #from .file_open import *
+    import time
+    from file_open import *
 
-    """
-    memory = [[None, None], 
-    ['start', 'LDD A'], 
-    [None, 'INC ACC'], 
-    [None, 'STO A'], 
-    [None, 'CMP #90'], 
-    [None, 'JPN start'], 
-    [None, 'LDM #66'],
-    [None, 'OUT'],
-    [None, 'END'], 
-    ['A', '66']]
+    memory, label_addr, line_addr, pc = OpenFile()
 
-    label_addr = {'start': 1, 'A': 9}
-    """
-
-    memory, label_addr, PC = open_file()
-
-    print(memory, label_addr, PC)
+    print(memory, label_addr, line_addr, pc)
 
     if memory != None:
-        ACC = 0
-        IX = 0
-        Compare = None
+        acc = 0
+        ix = 0
+        compare = None
         error = "no_error"
+        error_content = ""
         end = False
 
         while end == False and error == "no_error":
-            memory, PC, ACC, IX, Compare, error, end, Mode, AddressL1, AddressL2, Number, Out, Opcode, Operand, label = AnalysisAndRun(memory, PC, ACC, IX, Compare, label_addr)
-            print("PC {}\n\
-        ACC {}\n\
-        IX {}\n\
-        Compare {}\n\
-        error {}\n\
-        end {}\n\
-        Mode {}\n\
-        AddressL1 {}\n\
-        AddressL2 {}\n\
-        Number {}\n\
-        Out {}\n\
-        Opcode {}\n\
-        Operand {}\n\
-        label {}".format(PC, 
-    ACC, 
-    IX, 
-    Compare, 
-    error, 
-    end, 
-    Mode, 
-    AddressL1, 
-    AddressL2, 
-    Number, 
-    Out, 
-    Opcode, 
-    Operand, 
-    label))
+            current_address = pc
+            memory, pc, acc, ix, compare, error, end, mode, addressL1, addressL2, number, out, opcode, operand, label, error_content = AnalysisAndRun(memory, pc, acc, ix, compare, label_addr, line_addr, current_address)
+            print("CurrentAddress {}\n\
+PC {}\n\
+ACC {}\n\
+IX {}\n\
+Compare {}\n\
+error {}\n\
+end {}\n\
+Mode {}\n\
+AddressL1 {}\n\
+AddressL2 {}\n\
+Number {}\n\
+Out {}\n\
+Opcode {}\n\
+Operand {}\n\
+label {}\n\
+Error_Content {}".format(current_address,
+            pc, 
+            acc, 
+            ix, 
+            compare, 
+            error, 
+            end, 
+            mode, 
+            addressL1, 
+            addressL2, 
+            number, 
+            out, 
+            opcode, 
+            operand, 
+            label,
+            error_content))
+            time.sleep(0.5)
+    
+    end_state = "NO ERROR" if error == "no_error" else error + " ERROR"
+    print("The process ends with {}, please continue".format(end_state))

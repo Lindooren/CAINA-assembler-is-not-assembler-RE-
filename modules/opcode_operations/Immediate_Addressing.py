@@ -1,115 +1,123 @@
-#from TypeCheck import *
-#from Bitwise import *
-from .TypeCheck import *
-from .Bitwise import *
+#from type_check import *
+#from bitwise import *
 
-def ImmediateAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, line_addr, CurrentAddress):
+from .type_check import *
+from .bitwise import *
+
+def ImmediateAddressing (memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, line_addr, current_address):
     error_content = ""
 
     # remove # in the beginning of operand
-    temp = list(Operand)
+    temp = list(operand)
     temp.pop(0)
     temp2 = "".join(temp)
 
     # selection
-    if Opcode in ["LDM", "LDR", "CMP", "ADD", "SUB"]:
+    if opcode in ["LDM", "LDR", "CMP", "ADD", "SUB"]:
 
         # correct address/number format?
         if not AddressNumberCheck(temp2):
             error = "invalid_number"
-            error_content = "Line {}, Address {}.\n\'{}\' is not a valid number".format(line_addr[CurrentAddress], CurrentAddress, temp2)
+            error_content = "Line {}, Address {}.\n\'{}\' is not a valid number".format(line_addr[current_address], current_address, temp2)
         
         else:
-            Number = int(temp2)
-            if Opcode == "LDM":
-                ACC = Number
+            number = int(temp2)
+            if opcode == "LDM":
+                acc = number
 
-            elif Opcode == "LDR":
-                IX = Number
+            elif opcode == "LDR":
+                ix = number
 
-            elif Opcode == "CMP":
-                Compare = True if ACC == Number else False
+            elif opcode == "CMP":
+                compare = True if acc == number else False
 
-            elif Opcode == "ADD":
-                ACC = ACC + Number
+            elif opcode == "ADD":
+                acc = acc + number
 
-            elif Opcode == "SUB":
-                ACC = ACC - Number
+            elif opcode == "SUB":
+                acc = acc - number
 
-    elif Opcode in ["AND", "OR", "XOR"]:
-        Number = temp2
+    elif opcode in ["AND", "OR", "XOR"]:
+        number = temp2
 
         # check if this binary is valid
-        BinaryResultCheck = BinaryNumberCheck(Number)
-        if BinaryResultCheck:
+        if BinaryNumberCheck(number):
 
             # remove the heading B and store it to ACC
-            BinVal = RemoveB(Number)
-            ACC = BitWiseLogicalOperation(ACC, BinVal, Opcode)
+            bin_val = RemoveB(number)
+            acc = BitWiseLogicalOperation(acc, bin_val, opcode)
 
         else:
             error = "invalid_binary_number"
-            error_content = "Line {}, Address{}.\n\'{}\' is not a valid binary number".format(line_addr[CurrentAddress], CurrentAddress, Number)
+            error_content = "Line {}, Address{}.\n\'{}\' is not a valid binary number".format(line_addr[current_address], current_address, number)
 
-    elif Opcode in ["LSL", "LSR"]:
+    elif opcode in ["LSL", "LSR"]:
         if not AddressNumberCheck(temp2):
             error = "invalid_number"
-            error_content = "Line {}, Address {}.\n\'{}\' is not a valid number".format(line_addr[CurrentAddress], CurrentAddress, temp2)
+            error_content = "Line {}, Address {}.\n\'{}\' is not a valid number".format(line_addr[current_address], current_address, temp2)
         
         else:
-            NumPlaces = int(temp2)
+            num_places = int(temp2)
+            if num_places < 0:
+                error = "invalid_number_of_places_of_bit_shifting"
+                error_content = "Line {}, Address {}.\n\'{}\' is not a valid number of places of bit shifting number".format(line_addr[current_address], current_address, num_places)
             
-            # bits shifting
-            ACC = BitsShifting(ACC, NumPlaces, Opcode)
+            else:
+                # bits shifting
+                acc = BitsShifting(acc, num_places, opcode)
 
-    PC = PC + 1
+    pc = pc + 1
 
-    return memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, error_content
+    return memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, error_content
 
-#testing
+# testing
 if __name__ == "__main__":
-    memory = [[None, 'AND #100']]
+    from memory_space import *
+
+    location_a = memory_space()
+    location_b = memory_space(type="instruction", opcode="LSR", operand="#lasdjfklakljsdf")
+    location_c = memory_space()
+    memory = [location_a, location_b, location_c]
     
-    PC = 1
-    ACC = 8
-    IX = 0
-    Compare = False
+    pc = 1
+    acc = 8
+    ix = 0
+    compare = False
     error = "no_error"
     end = False
-    AddressL1 = None
-    AddressL2 = None
-    Number = None
-    Out = None
-    Opcode = "LSR"
-    Operand = "#1"
+    addressL1 = None
+    addressL2 = None
+    number = None
+    out = None
+    opcode = memory[pc].opcode
+    operand = memory[pc].operand
     line_addr = {1:1}
-    CurrentAddress = PC
+    current_address = pc
 
-    print("memory {}\n\
-        PC {}\n\
-        ACC {}\n\
-        IX {}\n\
-        Compare {}\n\
-        error {}\n\
-        end {}\n\
-        AddressL1 {}\n\
-        AddressL2 {}\n\
-        Number {}\n\
-        Out {}\n\
-        Opcode {}\n\
-        Operand {}\n\
-        error_content {}".format(*ImmediateAddressing(memory, 
-        PC, 
-        ACC, 
-        IX, 
-        Compare, 
-        error, 
-        end, 
-        AddressL1, 
-        AddressL2, 
-        Number, 
-        Out, 
-        Opcode, 
-        Operand, 
-        line_addr, 
-        CurrentAddress)))
+    print("PC {}\n\
+ACC {}\n\
+IX {}\n\
+Compare {}\n\
+error {}\n\
+end {}\n\
+AddressL1 {}\n\
+AddressL2 {}\n\
+Number {}\n\
+Out {}\n\
+Opcode {}\n\
+Operand {}\n\
+error_content {}".format(*ImmediateAddressing(memory, 
+    pc, 
+    acc, 
+    ix, 
+    compare, 
+    error, 
+    end, 
+    addressL1, 
+    addressL2, 
+    number, 
+    out, 
+    opcode, 
+    operand, 
+    line_addr, 
+    current_address)[1:]))

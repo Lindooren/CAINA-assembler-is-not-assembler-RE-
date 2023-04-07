@@ -1,148 +1,156 @@
-#from TypeCheck import *
-from .TypeCheck import *
+#from type_check import *
+from .type_check import *
 
-def IndirectAddressing (memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, label_addr, line_addr, CurrentAddress):
+def IndirectAddressing (memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, label_addr, line_addr, current_address):
     error_content = ""
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # check the type of operand. (L1)(一级地址)
-    result = OperandTypeCheck(Operand)
+    result = OperandTypeCheck(operand)
     if result == "invalid_label_name":
         error = result
-        error_content = "Line {}, Address {}.\n\'{}\' is not a valid label.".format(line_addr[CurrentAddress], CurrentAddress, Operand)
+        error_content = "Line {}, Address {}.\n\'{}\' is not a valid label.".format(line_addr[current_address], current_address, operand)
     
     else:
         try:
 
             # search the label in the dictionary (L1)
             if result == "label":
-                AddressL1 = label_addr[Operand]
+                addressL1 = label_addr[operand]
 
             else:
-                AddressL1 = int(Operand)
+                addressL1 = int(operand)
             
         except KeyError:
             error = "label_not_found_L1_address"
-            error_content = "Line {}, Address {}.\nCannot find level 1 address corresponds to label \'{}\'.".format(line_addr[CurrentAddress], CurrentAddress, Operand)
+            error_content = "Line {}, Address {}.\nCannot find level 1 address corresponds to label \'{}\'.".format(line_addr[current_address], current_address, operand)
 
         else:
 
             # check range (L1)
-            if not (1 <= AddressL1 <= len(memory) - 1):
+            if not (1 <= addressL1 <= len(memory) - 1):
                 error = "L1_address_out_of_range"
-                error_content = "Line {}, Address {}.\nLevel 1 address \'{}\' is too big or too small.".format(line_addr[CurrentAddress], CurrentAddress, AddressL1)
+                error_content = "Line {}, Address {}.\nLevel 1 address \'{}\' is too big or too small.".format(line_addr[current_address], current_address, addressL1)
 
             else:
-                
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 # get the content from AddressL1
-                content = memory[AddressL1][1]
+                addressL1_location = memory[addressL1]
+                if addressL1_location.type == "data":
 
-                # check the type of content (L2)(二级地址)
-                result = OperandTypeCheck(content)
-                if result == "invalid_label_name":
-                    error = result
-                    error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\n\'{}\' is not a valid label.".format(line_addr[CurrentAddress], CurrentAddress, line_addr[AddressL1], AddressL1, content)
-
-                else:
-                    try:
-
-                        # search the label in the dictionary (L1)
-                        if result == "label":
-                            AddressL2 = label_addr[content]
-
-                        else:
-                            AddressL2 = int(content)
-
-                    except KeyError:
-                        error = "label_not_found_L2_address"
-                        error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\nCannot find level 2 address corresponds to label \'{}\'.".format(line_addr[CurrentAddress], CurrentAddress, line_addr[AddressL1], AddressL1, content)
+                    # check the type of content (L2)(二级地址)
+                    result = OperandTypeCheck(addressL1_location.data)
+                    if result == "invalid_label_name":
+                        error = result
+                        error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\n\'{}\' is not a valid label.".format(line_addr[current_address], current_address, line_addr[addressL1], addressL1, addressL1_location.data)
 
                     else:
+                        try:
 
-                        # check range (L1)
-                        if not (1 <= AddressL2 <= len(memory) - 1):
-                            error = "L2_address_out_of_range"
-                            error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\nLevel 2 address \'{}\' is too big or too small.".format(line_addr[CurrentAddress], CurrentAddress, line_addr[AddressL1], AddressL1, AddressL2)
+                            # search the label in the dictionary (L2)
+                            if result == "label":
+                                addressL2 = label_addr[addressL1_location.data]
+
+                            else:
+                                addressL2 = int(addressL1_location.data)
+
+                        except KeyError:
+                            error = "label_not_found_L2_address"
+                            error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\nCannot find level 2 address corresponds to label \'{}\'.".format(line_addr[current_address], current_address, line_addr[addressL1], addressL1, addressL1_location.data)
 
                         else:
-                            try:
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                                if not (Opcode in ["STI"]):
-                                    Number = int(memory[AddressL2][1]) 
-                                        
-                                # selection
-                                if Opcode == "LDI":
-                                    ACC = Number
+                            # check range (L2)
+                            if not (1 <= addressL2 <= len(memory) - 1):
+                                error = "L2_address_out_of_range"
+                                error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\nLevel 2 address \'{}\' is too big or too small.".format(line_addr[current_address], current_address, line_addr[addressL1], addressL1, addressL2)
 
-                                elif Opcode == "CMI":
-                                    Compare = True if ACC == Number else False
+                            else:
+                                addressL2_location = memory[addressL2]
+                                if addressL2_location.type == "data":
+                                    try:
+                                        if not (opcode in ["STI"]):
+                                            number = int(addressL2_location.data) 
+                                                
+                                        # selection
+                                        if opcode == "LDI":
+                                            acc = number
 
-                                elif Opcode == "STI":
-                                    memory[AddressL2][1] = ACC
+                                        elif opcode == "CMI":
+                                            compare = True if acc == number else False
 
-                                PC = PC + 1
-                            
-                            except ValueError:
-                                error = "invalid_data_L2_address"
-                                error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\nLine {}, Level 2 address {}.\nThe data \'{}\' under level 2 address is invalid.".format(line_addr[CurrentAddress], CurrentAddress, line_addr[AddressL1], AddressL1, line_addr[AddressL2], AddressL2,memory[AddressL2][1])
+                                        elif opcode == "STI":
+                                            memory[addressL2].type = "data"
+                                            memory[addressL2].opcode, memory[addressL2].operand = None, None
+                                            memory[addressL2].data = str(acc)
 
-                            except TypeError:   # None represents empty memory location
-                                error = "data_not_find_L2_address"
-                                error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\nCannot find the data under level 2 address.".format(line_addr[CurrentAddress], CurrentAddress, line_addr[AddressL1], AddressL1, line_addr[AddressL2])
+                                        pc = pc + 1
+                                    
+                                    except ValueError:
+                                        error = "invalid_data_L2_address"
+                                        error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\nLine {}, Level 2 address {}.\nThe data \'{}\' under level 2 address is invalid.".format(line_addr[current_address], current_address, line_addr[addressL1], addressL1, line_addr[addressL2], addressL2, addressL2_location.data)
 
-    return memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, error_content
+                                else:
+                                    error = "invalid_L2_address_content_type"
+                                    error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\nLine {}, Level 2 address {}.\nTThe required memory lcoation at this level 1 address should be \'data\' but currently the type is \'{}\'".format(line_addr[current_address], current_address, line_addr[addressL1], addressL1, line_addr[addressL2], addressL2, addressL2_location.type)
+
+                else:
+                    error = "invalid_L1_address_content_type"
+                    error_content = "Line {}, Address {}.\nLine {}, Level 1 address {}.\nThe required memory lcoation at this level 1 address should be \'data\' but currently the type is \'{}\'".format(line_addr[current_address], current_address, line_addr[addressL1], addressL1, addressL1_location.type)
+
+    return memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, error_content
 
 #testing
 if __name__ == "__main__":
-    memory = [[None, None],
-            [None, 'LDI 2'],
-            [None, '3'],
-            [None, None]]
+    from memory_space import *
 
-    PC = 1
-    ACC = 10
-    IX = 0
-    Compare = False
+    location_a = memory_space()
+    location_b = memory_space(type="instruction", opcode="STI", operand="2")
+    location_c = memory_space(type="data", label="shabi", data="zhizhang")
+    location_d = memory_space(type="data", label="zhizhang", data="0")
+    location_e = memory_space(type="instruction", opcode="END")
+    memory = [location_a, location_b, location_c, location_d, location_e]
+    
+    pc = 1
+    acc = 10
+    ix = 0
+    compare = None
     error = "no_error"
     end = False
-    AddressL1 = None
-    AddressL2 = None
-    Number = None
-    Out = None
-    Opcode = "STI"
-    Operand = "2"
-    label_addr = {}
-    line_addr = {1:1, 2:2, 3:3}
-    CurrentAddress = PC
+    addressL1 = None
+    addressL2 = None
+    number = None
+    out = None
+    opcode = memory[pc].opcode
+    operand = memory[pc].operand
+    label_addr = {"shabi":2, "zhizhang":3}
+    line_addr = {1:1, 2:2, 3:3, 4:4}
+    current_address = pc
 
-    print("memory {}\n\
-        PC {}\n\
-        ACC {}\n\
-        IX {}\n\
-        Compare {}\n\
-        error {}\n\
-        end {}\n\
-        AddressL1 {}\n\
-        AddressL2 {}\n\
-        Number {}\n\
-        Out {}\n\
-        Opcode {}\n\
-        Operand {}\n\
-        error_content {}".format(*IndirectAddressing(memory, 
-        PC, 
-        ACC, 
-        IX, 
-        Compare, 
-        error, 
-        end, 
-        AddressL1, 
-        AddressL2, 
-        Number, 
-        Out, 
-        Opcode, 
-        Operand, 
-        label_addr,
-        line_addr, 
-        CurrentAddress)))
+    print("PC {}\n\
+ACC {}\n\
+IX {}\n\
+Compare {}\n\
+error {}\n\
+end {}\n\
+AddressL1 {}\n\
+AddressL2 {}\n\
+Number {}\n\
+Out {}\n\
+Opcode {}\n\
+Operand {}\n\
+error_content {}".format(*IndirectAddressing(memory, 
+    pc, 
+    acc, 
+    ix, 
+    compare, 
+    error, 
+    end, 
+    addressL1, 
+    addressL2, 
+    number, 
+    out, 
+    opcode, 
+    operand, 
+    label_addr,
+    line_addr, 
+    current_address)[1:]))

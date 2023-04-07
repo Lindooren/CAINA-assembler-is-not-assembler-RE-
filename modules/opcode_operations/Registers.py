@@ -1,89 +1,91 @@
-def Registers (memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, line_addr, CurrentAddress):
+def Registers (memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, line_addr, current_address):
     error_content = ""
     
-    if Opcode == "MOV":
-        if Operand == "IX":
-            IX = ACC
+    if opcode == "MOV":
+        if operand == "IX":
+            ix = acc
 
         else:
             error = "invalid_register"
-            error_content = "Line {}, Address {}.\n\'{}\' is not a valid register.".format(line_addr[CurrentAddress], CurrentAddress, Operand)
+            error_content = "Line {}, Address {}.\n\'{}\' is not a valid register for opcode \'{}\'.".format(line_addr[current_address], current_address, operand, opcode)
 
-    elif Opcode == "INC":
-        if Operand == "ACC":
-            ACC += 1
+    elif opcode == "INC":
+        if operand == "ACC":
+            acc += 1
 
-        elif Operand == "IX":
-            IX += 1
-
-        else:
-            error = "invalid_register"
-            error_content = "Line {}, Address {}.\n\'{}\' is not a valid register.".format(line_addr[CurrentAddress], CurrentAddress, Operand)
-
-    elif Opcode == "DEC":
-        if Operand == "ACC":
-            ACC -= 1
-
-        elif Operand == "IX":
-            IX -= 1
+        elif operand == "IX":
+            ix += 1
 
         else:
             error = "invalid_register"
-            error_content = "Line {}, Address {}.\n\'{}\' is not a valid register.".format(line_addr[CurrentAddress], CurrentAddress, Operand)
+            error_content = "Line {}, Address {}.\n\'{}\' is not a valid register for opcode \'{}\'.".format(line_addr[current_address], current_address, operand, opcode)
 
-    PC += 1
+    elif opcode == "DEC":
+        if operand == "ACC":
+            acc -= 1
 
-    return memory, PC, ACC, IX, Compare, error, end, AddressL1, AddressL2, Number, Out, Opcode, Operand, error_content
+        elif operand == "IX":
+            ix -= 1
+
+        else:
+            error = "invalid_register"
+            error_content = "Line {}, Address {}.\n\'{}\' is not a valid register for opcode \'{}\'.".format(line_addr[current_address], current_address, operand, opcode)
+
+    pc += 1
+
+    return memory, pc, acc, ix, compare, error, end, addressL1, addressL2, number, out, opcode, operand, error_content
 
 #testing
 if __name__ == "__main__":
+    from memory_space import *
+
+    location_a = memory_space()
+    location_b = memory_space(type="instruction", opcode="MOV", operand="ACC")
+    location_c = memory_space(type="data", label="shabi", data="zhizhang")
+    location_d = memory_space(type="data", label="zhizhang", data="0")
+    location_e = memory_space(type="instruction", opcode="END")
+    memory = [location_a, location_b, location_c, location_d, location_e]
     
-    memory = [[None, None], 
-    ['Start', 'LDM B'], 
-    [None, 'LDM C'], 
-    [None, 'LDM 5'], 
-    ['B', 'C'], 
-    ['C', '10'], 
-    [None, None],
-    [None, 'GGG']]
-
-    line_addr = {'Start': 1, 'B': 4, 'C': 5}
-
-    PC = 1
-    ACC = 9
-    IX = 1
-    Compare = False
+    pc = 1
+    acc = 10
+    ix = 0
+    compare = None
     error = "no_error"
     end = False
-    AddressL1 = None
-    AddressL2 = None
-    Number = None
-    Out = None
-    Opcode = "INC"
-    Operand = "AC"
+    addressL1 = None
+    addressL2 = None
+    number = None
+    out = None
+    opcode = memory[pc].opcode
+    operand = memory[pc].operand
+    label_addr = {"shabi":2, "zhizhang":3}
+    line_addr = {1:1, 2:2, 3:3, 4:4}
+    current_address = pc
 
-    print("memory {}\n\
-        PC {}\n\
-        ACC {}\n\
-        IX {}\n\
-        Compare {}\n\
-        error {}\n\
-        end {}\n\
-        AddressL1 {}\n\
-        AddressL2 {}\n\
-        Number {}\n\
-        Out {}\n\
-        Opcode {}\n\
-        Operand {}\n".format(*Registers(memory, 
-        PC, 
-        ACC, 
-        IX, 
-        Compare, 
-        error, 
-        end, 
-        AddressL1, 
-        AddressL2, 
-        Number, 
-        Out, 
-        Opcode, 
-        Operand)))
+    print("PC {}\n\
+ACC {}\n\
+IX {}\n\
+Compare {}\n\
+error {}\n\
+end {}\n\
+AddressL1 {}\n\
+AddressL2 {}\n\
+Number {}\n\
+Out {}\n\
+Opcode {}\n\
+Operand {}\n\
+Error Content {}".format(*Registers(memory, 
+    pc, 
+    acc, 
+    ix, 
+    compare, 
+    error, 
+    end, 
+    addressL1, 
+    addressL2, 
+    number, 
+    out, 
+    opcode, 
+    operand,
+    line_addr,
+    current_address)[1:]))
