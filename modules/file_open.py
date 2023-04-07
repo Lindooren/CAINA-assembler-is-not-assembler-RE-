@@ -2,12 +2,13 @@ import tkinter.filedialog
 from tkinter import messagebox
 import os
 
-#from .opcodes import *
-#from .memory_space import *
-#from .opcode_operations.TypeCheck import *
-from opcodes import *
-from memory_space import *
-from opcode_operations.type_check import *
+from .opcodes import *
+from .memory_space import *
+from .opcode_operations.type_check import *
+
+#from opcodes import *
+#from memory_space import *
+#from opcode_operations.type_check import *
 
 # file open main procedure
 def OpenFile ():
@@ -39,7 +40,7 @@ def OpenFile ():
 
         # read line
         for line in f:
-            line = line[:-1].strip()
+            line = line.strip()
             addr = line_counter
             type = None
             label = None

@@ -1,16 +1,16 @@
-#from .opcode_operations.immediate_addressing import *
-#from .opcode_operations.direct_addressing import *
-#from .opcode_operations.indirect_addressing import *
-#from .opcode_operations.indexed_addressing import *
-#from .opcode_operations.registers import *
-#from .opcodes import *
+from .opcode_operations.immediate_addressing import *
+from .opcode_operations.direct_addressing import *
+from .opcode_operations.indirect_addressing import *
+from .opcode_operations.indexed_addressing import *
+from .opcode_operations.registers import *
+from .opcodes import *
 
-from opcode_operations.immediate_addressing import *
-from opcode_operations.direct_addressing import *
-from opcode_operations.indirect_addressing import *
-from opcode_operations.indexed_addressing import *
-from opcode_operations.registers import *
-from opcodes import *
+#from opcode_operations.immediate_addressing import *
+#from opcode_operations.direct_addressing import *
+#from opcode_operations.indirect_addressing import *
+#from opcode_operations.indexed_addressing import *
+#from opcode_operations.registers import *
+#from opcodes import *
 
 # main thread for analyse and run
 def AnalysisAndRun (memory, pc, acc, ix, compare, label_addr, line_addr, current_address):
